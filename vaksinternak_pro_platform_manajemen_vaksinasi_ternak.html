@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaksinTernak Pro - Platform Manajemen & Edukasi Vaksinasi Ternak</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        farm: {
+                            50: '#f4f7f2',
+                            100: '#e3ebd8',
+                            200: '#c7d9b4',
+                            500: '#52796f',
+                            600: '#354f52',
+                            700: '#2f3e46',
+                            800: '#1e282d',
+                        },
+                        amberEarth: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#d97706',
+                            600: '#b45309',
+                            700: '#92400e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(47,62,70,0.92) 0%, rgba(53,79,82,0.85) 100%), 
+                        url('https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-30 no-print shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-farm-600 text-white p-2.5 rounded-2xl shadow-md flex items-center justify-center">
+                        <i data-lucide="syringe" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-xl text-farm-800 tracking-tight flex items-center gap-1.5">
+                            VaksinTernak <span class="bg-amberEarth-500 text-white text-xs px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Pro</span>
+                        </span>
+                        <p class="text-xs text-stone-500 font-medium">Sistem Monitoring Kesehatan & Vaksinasi Ternak</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1 bg-stone-100 p-1.5 rounded-2xl">
+                    <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn flex items-center space-x-2 px-4 py-2 text-sm font-bold rounded-xl text-farm-700 bg-white shadow-sm transition">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="tab-btn flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-xl text-stone-600 hover:text-stone-900 transition">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Panduan & Jadwal</span>
+                    </button>
+                    <button onclick="switchTab('calculator')" id="tab-btn-calculator" class="tab-btn flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-xl text-stone-600 hover:text-stone-900 transition">
+                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                        <span>Kalkulator Dosis</span>
+                    </button>
+                    <button onclick="switchTab('symptoms')" id="tab-btn-symptoms" class="tab-btn flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-xl text-stone-600 hover:text-stone-900 transition">
+                        <i data-lucide="stethoscope" class="w-4 h-4"></i>
+                        <span>Deteksi & FAQ KIPI</span>
+                    </button>
+                    <button onclick="switchTab('logs')" id="tab-btn-logs" class="tab-btn flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-xl text-stone-600 hover:text-stone-900 transition">
+                        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                        <span>Log Vaksinasi</span>
+                    </button>
+                </nav>
+
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.print()" class="flex items-center space-x-1.5 text-sm bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-3.5 py-2 rounded-xl transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Cetak Kartu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Bar -->
+        <div class="md:hidden flex overflow-x-auto border-t border-stone-200 bg-stone-100 p-2 text-xs font-semibold space-x-1">
+            <button onclick="switchTab('dashboard')" class="px-3 py-2 rounded-lg bg-white shadow-sm font-bold text-farm-700">Dashboard</button>
+            <button onclick="switchTab('schedule')" class="px-3 py-2 text-stone-600">Jadwal</button>
+            <button onclick="switchTab('calculator')" class="px-3 py-2 text-stone-600">Kalkulator</button>
+            <button onclick="switchTab('symptoms')" class="px-3 py-2 text-stone-600">Deteksi</button>
+            <button onclick="switchTab('logs')" class="px-3 py-2 text-stone-600">Log Data</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- SECTION 1: DASHBOARD OVERVIEW -->
+        <div id="section-dashboard" class="tab-content space-y-6">
+            
+            <!-- Hero Banner -->
+            <div class="hero-bg rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
+                <div class="max-w-2xl space-y-3 z-10">
+                    <span class="inline-flex items-center gap-1.5 bg-amberEarth-500/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Proteksi Kesehatan Ternak
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">Manajemen Vaksinasi & Imunitas Hewan Ternak</h2>
+                    <p class="text-stone-200 text-sm sm:text-base">Cegah penyakit infeksius seperti PMK, Antraks, SE, dan ND dengan jadwal teratur dan dosis presisi sesuai standar peternakan modern.</p>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-3 z-10">
+                    <button onclick="switchTab('calculator')" class="bg-amberEarth-500 hover:bg-amberEarth-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg flex items-center space-x-2">
+                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                        <span>Hitung Kebutuhan Vaksin</span>
+                    </button>
+                    <button onclick="switchTab('logs')" class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition border border-white/20 flex items-center space-x-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Catat Suntikan Baru</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Total Record Suntikan</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-1" id="dash-total-logs">0</h3>
+                        <p class="text-xs text-farm-600 font-medium mt-1">Sesi Terdaftar</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-farm-50 text-farm-600 flex items-center justify-center">
+                        <i data-lucide="file-badge" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Spesies Ternak Utama</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-1">4 Jenis</h3>
+                        <p class="text-xs text-stone-500 font-medium mt-1">Sapi, Kambing, Unggas, Babi</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amberEarth-50 text-amberEarth-600 flex items-center justify-center">
+                        <i data-lucide="paw-print" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Vaksin Wajib Nasional</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-1">6 Utama</h3>
+                        <p class="text-xs text-emerald-600 font-medium mt-1">PMK, Antraks, SE, Brucellosis, ND, CSF</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Suhu Storage Ideal</p>
+                        <h3 class="text-2xl font-extrabold text-blue-600 mt-1">2°C - 8°C</h3>
+                        <p class="text-xs text-stone-500 font-medium mt-1">Standar Cold-Chain</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <i data-lucide="thermometer" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Chart & Reminders -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-stone-800 text-base">Distribusi Rekam Vaksinasi per Spesies</h3>
+                            <p class="text-xs text-stone-500">Persentase data vaksinasi yang telah dimasukkan ke dalam logbook</p>
+                        </div>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="vaccineDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-stone-800 text-base flex items-center gap-2">
+                            <i data-lucide="bell" class="w-4 h-4 text-amberEarth-500"></i>
+                            <span>Catatan Penting Peternak</span>
+                        </h3>
+                        <ul class="mt-3 space-y-3 text-xs">
+                            <li class="p-3 bg-amberEarth-50 border-l-4 border-amberEarth-500 text-stone-700 rounded-r-xl">
+                                <strong class="block text-stone-900 font-bold">Vaksinasi PMK Booster</strong>
+                                Pengulangan dosis kedua diberikan 4 minggu setelah vaksinasi pertama pada anak sapi/pedet.
+                            </li>
+                            <li class="p-3 bg-farm-50 border-l-4 border-farm-500 text-stone-700 rounded-r-xl">
+                                <strong class="block text-stone-900 font-bold">Manajemen Anti-Stres</strong>
+                                Berikan multivitamin dan suplemen elektrolit 3 hari sebelum dan sesudah vaksinasi massal.
+                            </li>
+                            <li class="p-3 bg-stone-100 border-l-4 border-stone-400 text-stone-700 rounded-r-xl">
+                                <strong class="block text-stone-900 font-bold">Pengadaan Alat Suntik</strong>
+                                Pastikan jarum suntik steril dan ganti per 10-15 ekor untuk mencegah kontaminasi silang.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 2: VACCINE SCHEDULE TRACKER -->
+        <div id="section-schedule" class="tab-content hidden space-y-6">
+            
+            <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h2 class="font-bold text-xl text-stone-900 flex items-center gap-2">
+                            <i data-lucide="calendar" class="w-5 h-5 text-farm-600"></i>
+                            <span>Panduan & Jadwal Baku Vaksinasi Ternak</span>
+                        </h2>
+                        <p class="text-xs text-stone-500">Rekomendasi dosis, rute injeksi, dan frekuensi booster untuk pencegahan wabah.</p>
+                    </div>
+                    
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap gap-1 bg-stone-100 p-1 rounded-xl text-xs font-bold">
+                        <button onclick="filterSchedule('All')" class="filter-btn active px-3 py-1.5 rounded-lg bg-white text-stone-800 shadow-sm">Semua</button>
+                        <button onclick="filterSchedule('Sapi')" class="filter-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">Sapi / Kerbau</button>
+                        <button onclick="filterSchedule('Kambing')" class="filter-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">Kambing / Domba</button>
+                        <button onclick="filterSchedule('Unggas')" class="filter-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">Unggas</button>
+                        <button onclick="filterSchedule('Babi')" class="filter-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">Babi</button>
+                    </div>
+                </div>
+
+                <!-- Schedule Cards Grid -->
+                <div id="schedule-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 3: VACCINATION CALCULATOR -->
+        <div id="section-calculator" class="tab-content hidden space-y-6">
+            
+            <div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div>
+                    <h2 class="font-bold text-xl text-stone-900 flex items-center gap-2">
+                        <i data-lucide="calculator" class="w-6 h-6 text-amberEarth-500"></i>
+                        <span>Kalkulator Kebutuhan & Biaya Vaksin</span>
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-1">Estimasi jumlah vial/botol vaksin dan total biaya berdasarkan populasi ternak Anda.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-stone-50 p-5 rounded-2xl border border-stone-200">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">Pilih Jenis Vaksin</label>
+                        <select id="calc-vaccine-select" onchange="runCalculator()" class="w-full bg-white border border-stone-300 rounded-xl p-2.5 text-sm font-semibold focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">Jumlah Populasi Ternak (Ekor)</label>
+                        <input type="number" id="calc-pop-size" value="50" min="1" oninput="runCalculator()" class="w-full bg-white border border-stone-300 rounded-xl p-2.5 text-sm font-semibold focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">Kapasitas Botol (Dosis / Vial)</label>
+                        <select id="calc-vial-capacity" onchange="runCalculator()" class="w-full bg-white border border-stone-300 rounded-xl p-2.5 text-sm font-semibold focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                            <option value="10">10 Dosis / Vial</option>
+                            <option value="50" selected>50 Dosis / Vial</option>
+                            <option value="100">100 Dosis / Vial</option>
+                            <option value="500">500 Dosis / Vial</option>
+                            <option value="1000">1000 Dosis / Vial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">Harga Per Vial (Rp)</label>
+                        <input type="number" id="calc-price-per-vial" value="150000" step="5000" oninput="runCalculator()" class="w-full bg-white border border-stone-300 rounded-xl p-2.5 text-sm font-semibold focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Calculation Results -->
+                <div class="bg-farm-50 border border-farm-200 rounded-2xl p-6 text-farm-800 space-y-4">
+                    <h3 class="font-bold text-sm uppercase tracking-wider text-farm-600">Hasil Estimasi</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-farm-100 shadow-sm">
+                            <span class="text-xs text-stone-500 font-medium">Total Dosis Diperlukan</span>
+                            <h4 id="res-total-doses" class="text-xl font-extrabold text-stone-900 mt-1">50 ml/dosis</h4>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-farm-100 shadow-sm">
+                            <span class="text-xs text-stone-500 font-medium">Jumlah Botol (Vial)</span>
+                            <h4 id="res-vials-needed" class="text-xl font-extrabold text-amberEarth-600 mt-1">1 Vial</h4>
+                            <p class="text-[10px] text-stone-400 mt-0.5">*Termasuk angka pembulatan ke atas</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-farm-100 shadow-sm">
+                            <span class="text-xs text-stone-500 font-medium">Estimasi Biaya Total</span>
+                            <h4 id="res-total-cost" class="text-xl font-extrabold text-emerald-600 mt-1">Rp 150.000</h4>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-white/70 rounded-xl text-xs text-stone-600 flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 text-farm-600 shrink-0 mt-0.5"></i>
+                        <span>Disarankan menyiapkan cadangan (buffer stock) 5-10% dari total populasi untuk mengantisipasi vaksin tumpah atau kebutuhan re-vaksinasi.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 4: SYMPTOMS & KIPI EDUCATIONAL CHECKER -->
+        <div id="section-symptoms" class="tab-content hidden space-y-6">
+            
+            <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <div>
+                    <h2 class="font-bold text-xl text-stone-900 flex items-center gap-2">
+                        <i data-lucide="stethoscope" class="w-6 h-6 text-emerald-600"></i>
+                        <span>Cek Respon Pasca Vaksinasi (KIPI) & FAQ Panduan</span>
+                    </h2>
+                    <p class="text-xs text-stone-500 mt-1">Panduan penanganan cepat bila ternak mengalami gejala demam, bengkak, atau alergi setelah menerima vaksin.</p>
+                </div>
+
+                <!-- Symptom Interactive Selector -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-stone-700">Pilih Gejala Teramati:</label>
+                        <div class="space-y-2">
+                            <button onclick="showKipiDetail('swelling')" class="kipi-btn w-full text-left p-3 rounded-xl border border-stone-200 hover:border-farm-500 hover:bg-farm-50 font-semibold text-xs transition flex justify-between items-center">
+                                <span>1. Pembengkakan Bekas Suntikan</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+                            </button>
+                            <button onclick="showKipiDetail('fever')" class="kipi-btn w-full text-left p-3 rounded-xl border border-stone-200 hover:border-farm-500 hover:bg-farm-50 font-semibold text-xs transition flex justify-between items-center">
+                                <span>2. Demam Ringan & Nafsu Makan Turun</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+                            </button>
+                            <button onclick="showKipiDetail('anaphylaxis')" class="kipi-btn w-full text-left p-3 rounded-xl border border-stone-200 hover:border-farm-500 hover:bg-farm-50 font-semibold text-xs transition flex justify-between items-center">
+                                <span>3. Syok Anafilaksis (Alergi Berat)</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+                            </button>
+                            <button onclick="showKipiDetail('dropmilk')" class="kipi-btn w-full text-left p-3 rounded-xl border border-stone-200 hover:border-farm-500 hover:bg-farm-50 font-semibold text-xs transition flex justify-between items-center">
+                                <span>4. Penurunan Produksi Susu Sementara</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 bg-stone-50 p-5 rounded-2xl border border-stone-200" id="kipi-result-box">
+                        <div class="flex items-center gap-2 text-stone-400 mb-2">
+                            <i data-lucide="help-circle" class="w-5 h-5"></i>
+                            <span class="text-xs font-medium">Klik salah satu gejala di sebelah kiri untuk melihat solusinya.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Accordion Section -->
+                <div class="border-t border-stone-200 pt-6 space-y-4">
+                    <h3 class="font-bold text-stone-800 text-base">Pertanyaan Sering Diajukan (FAQ) Vaksinasi Ternak</h3>
+                    
+                    <div class="space-y-3 text-xs">
+                        <details class="bg-stone-50 rounded-xl p-4 border border-stone-200 group">
+                            <summary class="font-bold text-stone-800 cursor-pointer flex justify-between items-center">
+                                Bolehkan menyuntikkan vaksin pada ternak yang sedang hamil?
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 group-open:rotate-180 transition"></i>
+                            </summary>
+                            <p class="mt-2 text-stone-600 leading-relaxed">
+                                Tergantung jenis vaksinnya. Kebanyakan vaksin inaktif (killed vaccine) aman untuk ternak bunting trimester pertengahan, namun vaksin aktif (live vaccine) berisiko memicu keguguran. Selalu konsultasikan dengan dokter hewan sebelum menangani induk bunting.
+                            </p>
+                        </details>
+
+                        <details class="bg-stone-50 rounded-xl p-4 border border-stone-200 group">
+                            <summary class="font-bold text-stone-800 cursor-pointer flex justify-between items-center">
+                                Berapa lama kekebalan (imunitas) terbentuk setelah ternak divaksin?
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 group-open:rotate-180 transition"></i>
+                            </summary>
+                            <p class="mt-2 text-stone-600 leading-relaxed">
+                                Imunitas optimal umumnya terbentuk dalam 14 - 21 hari setelah pemberian suntikan pertama atau suntikan ulangan (booster). Selama periode ini, pastikan kebersihan biosekuriti kandang tetap dijaga ketat.
+                            </p>
+                        </details>
+
+                        <details class="bg-stone-50 rounded-xl p-4 border border-stone-200 group">
+                            <summary class="font-bold text-stone-800 cursor-pointer flex justify-between items-center">
+                                Bagaimana cara menyimpan vaksin yang belum habis dipakai?
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 group-open:rotate-180 transition"></i>
+                            </summary>
+                            <p class="mt-2 text-stone-600 leading-relaxed">
+                                Vaksin yang sudah dilarutkan (seperti vaksin ND atau Antraks tertentu) harus dihabiskan dalam rentang waktu 2 - 4 jam. Jangan menyimpan vaksin sisa sediaan cair yang telah dilarutkan untuk digunakan esok hari karena efektivitasnya akan hilang dan berisiko terkontaminasi bakteri.
+                            </p>
+                        </details>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SECTION 5: LOGBOOK VAKSINASI (RECORD & LOGS) -->
+        <div id="section-logs" class="tab-content hidden space-y-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Form Add Log -->
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4 no-print">
+                    <h2 class="font-bold text-lg text-stone-900 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-farm-600"></i>
+                        <span>Input Sesi Vaksinasi</span>
+                    </h2>
+                    
+                    <form id="vaccine-log-form" onsubmit="saveVaccineLog(event)" class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold text-stone-700 mb-1">Identitas Kandang / Kelompok Ternak</label>
+                            <input type="text" id="log-farm-name" required placeholder="Contoh: Kandang A - Sapi Perah" class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-stone-700 mb-1">Spesies Ternak</label>
+                                <select id="log-species" class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                                    <option value="Sapi">Sapi / Kerbau</option>
+                                    <option value="Kambing">Kambing / Domba</option>
+                                    <option value="Unggas">Unggas (Ayam/Bebek)</option>
+                                    <option value="Babi">Babi</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-stone-700 mb-1">Jumlah Hewan (Ekor)</label>
+                                <input type="number" id="log-headcount" min="1" required placeholder="50" class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-stone-700 mb-1">Jenis Vaksin Yang Diberikan</label>
+                            <input type="text" id="log-vaccine-name" required placeholder="Contoh: Aftogen Oleo (PMK)" class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-stone-700 mb-1">Tanggal Penyuntikan</label>
+                                <input type="date" id="log-date" required class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-stone-700 mb-1">Jadwal Booster Next</label>
+                                <input type="date" id="log-next-date" class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-stone-700 mb-1">Petugas / Peternak Pelaksana</label>
+                            <input type="text" id="log-officer" placeholder="Drh. Budi / Mantri Kandang" class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-stone-700 mb-1">Catatan Tambahan</label>
+                            <textarea id="log-notes" rows="2" placeholder="Kondisi ternak sehat, suhu tubuh normal..." class="w-full border border-stone-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-farm-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-farm-600 hover:bg-farm-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>Simpan Rekam Medis Vaksin</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Table Logs Display -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="font-bold text-lg text-stone-900">Riwayat Vaksinasi Kandang</h2>
+                            <p class="text-xs text-stone-500">Tersimpan secara lokal di peramban web Anda</p>
+                        </div>
+                        <button onclick="clearAllLogs()" class="no-print text-xs text-red-600 hover:text-red-700 font-semibold px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 transition">
+                            Hapus Semua
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-stone-100 text-stone-700 uppercase font-bold text-[10px]">
+                                <tr>
+                                    <th class="p-3 rounded-l-xl">Lokasi / Kandang</th>
+                                    <th class="p-3">Spesies & Jml</th>
+                                    <th class="p-3">Nama Vaksin</th>
+                                    <th class="p-3">Tgl Suntik</th>
+                                    <th class="p-3">Jadwal Ulangan</th>
+                                    <th class="p-3 rounded-r-xl no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body" class="divide-y divide-stone-100 font-medium">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 mt-12 py-6 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-stone-500 space-y-2">
+            <p class="font-bold text-stone-700">VaksinTernak Pro — Platform Aplikasi Penelitian & Manajemen Kesehatan Ternak</p>
+            <p>Didesain untuk Peternak, Mantri Hewan, Mahasiswa Peternakan & Kedokteran Hewan.</p>
+            <p class="text-[10px] text-stone-400">© 2026 VaksinTernak Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Database Standard Vaccine Schedule
+        const VACCINE_DATABASE = [
+            {
+                id: "pmk-sapi",
+                species: "Sapi",
+                name: "Vaksin PMK (Penyakit Mulut & Kuku)",
+                target: "Sapi, Kerbau",
+                age: "Mulai umur 2 minggu",
+                dose: "2 ml / ekor",
+                route: "Subkutan (SC) atau Intramuskular (IM)",
+                booster: "Booster 1 bulan kemudian, lalu ulang 6 bulan sekali",
+                description: "Mencegah infeksi virus Aphtovirus pemicu luka mulut, kuku terlepas, dan penurunan drastis bobot badan."
+            },
+            {
+                id: "antraks-sapi",
+                species: "Sapi",
+                name: "Vaksin Antraks (Bacillus anthracis)",
+                target: "Sapi, Kerbau, Kambing",
+                age: "Mulai umur 6 bulan",
+                dose: "1 ml / ekor",
+                route: "Subkutan (SC)",
+                booster: "Diulang rutin 1 tahun sekali di daerah endemik",
+                description: "Sangat penting di wilayah endemik untuk mencegah kematian mendadak akibat spora antraks."
+            },
+            {
+                id: "se-sapi",
+                species: "Sapi",
+                name: "Vaksin SE (Septicemia Epizootica)",
+                target: "Sapi, Kerbau",
+                age: "Mulai umur 6 bulan",
+                dose: "3 ml / ekor",
+                route: "Intramuskular (IM)",
+                booster: "Diulang 1 tahun sekali sebelum musim hujan",
+                description: "Mencegah penyakit Ngorok (SE) yang menyerang saluran pernapasan ternak ruminansia."
+            },
+            {
+                id: "peste-kambing",
+                species: "Kambing",
+                name: "Vaksin PPR / ORF Kambing",
+                target: "Kambing & Domba",
+                age: "Mulai umur 3 bulan",
+                dose: "1 ml / ekor",
+                route: "Subkutan (SC)",
+                booster: "Diulang 1 tahun sekali",
+                description: "Mencegah penyakit bercak keropeng di area mulut kambing serta radang usus parah."
+            },
+            {
+                id: "nd-unggas",
+                species: "Unggas",
+                name: "Vaksin ND (Newcastle Disease / Tetelo)",
+                target: "Ayam Broiler, Layer, Bebek",
+                age: "Umur 4 hari (Tetes mata) & 18 hari (Suntik)",
+                dose: "1 tetes / 0.5 ml suntik",
+                route: "Tetes Mata/Hidung atau Intramuskular",
+                booster: "Setiap 2-3 bulan pada ayam petelur (layer)",
+                description: "Melindungi unggas dari leher terputar, kelumpuhan, dan tingkat kematian massal."
+            },
+            {
+                id: "csf-babi",
+                species: "Babi",
+                name: "Vaksin Hog Cholera / CSF",
+                target: "Babi",
+                age: "Umur 6 - 8 minggu",
+                dose: "2 ml / ekor",
+                route: "Intramuskular (IM)",
+                booster: "Indukan diulang setiap sebelum dikawinkan",
+                description: "Mencegah penyakit kolera babi yang sangat menular pada anak babi dan indukan."
+            }
+        ];
+
+        // KIPI Educational Guide Data
+        const KIPI_GUIDE = {
+            swelling: {
+                title: "Pembengkakan / Benjolan Lokal",
+                risk: "Ringan & Normal",
+                desc: "Benjolan kecil di lokasi suntikan (leher/paha) adalah reaksi inflamasi lokal awal saat tubuh mengenali antigen vaksin.",
+                action: "Kompres hangat area yang bengkak selama 5-10 menit. Jangan diurut keras. Benjolan biasanya akan hilang secara alami dalam 1 - 2 minggu."
+            },
+            fever: {
+                title: "Demam Ringan & Turun Nafsu Makan",
+                risk: "Sedang",
+                desc: "Suhu tubuh ternak meningkat 1-1.5°C disertai nafsu makan yang sedikit menurun selama 24-48 jam.",
+                action: "Sedikan air minum segar yang cukup. Berikan tambahan suplemen multivitamin dan tempatkan ternak di area kandang yang sejuk dan teduh."
+            },
+            anaphylaxis: {
+                title: "Syok Anafilaksis (Alergi Berat)",
+                risk: "Darurat (Perlu Penanganan Medis)",
+                desc: "Terjadi dalam kurun waktu 5 - 30 menit setelah disuntik. Gejala: Gatal hebat, sesak napas, mata membengkak, hingga ambruk.",
+                action: "SEGERA berikan injeksi Antihistamin atau Epinefrin/Adrenalin sesuai dosis petunjuk dokter hewan setempat."
+            },
+            dropmilk: {
+                title: "Penurunan Produksi Susu Sementara",
+                risk: "Ringan",
+                desc: "Pada sapi/kambing perah, produksi susu dapat turun 5-15% selama 2-3 hari pasca vaksinasi akibat respon metabolisme imunitas.",
+                action: "Tingkatkan kualitas pakan konsentrat kaya energi dan berikan nutrisi berkualitas. Produksi akan kembali normal dalam waktu 4-5 hari."
+            }
+        };
+
+        let chartInstance = null;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderScheduleCards('All');
+            initCalculatorDropdown();
+            runCalculator();
+            loadLogsTable();
+            initChart();
+            
+            // Set Default Date in form
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('log-date').value = today;
+        });
+
+        // Tab Switch Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'shadow-sm', 'text-farm-700', 'font-bold');
+                btn.classList.add('text-stone-600', 'font-semibold');
+            });
+
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'shadow-sm', 'text-farm-700', 'font-bold');
+                activeBtn.classList.remove('text-stone-600');
+            }
+        }
+
+        // Render Vaccine Schedule Cards
+        function renderScheduleCards(filterSpecies) {
+            const grid = document.getElementById('schedule-cards-grid');
+            grid.innerHTML = '';
+
+            const filtered = filterSpecies === 'All' 
+                ? VACCINE_DATABASE 
+                : VACCINE_DATABASE.filter(item => item.species.toLowerCase() === filterSpecies.toLowerCase());
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-stone-50 rounded-2xl p-5 border border-stone-200 flex flex-col justify-between hover:border-farm-500 transition shadow-sm";
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-farm-100 text-farm-800 text-[10px] font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wider">${item.species}</span>
+                            <span class="text-xs text-stone-400 font-bold">${item.target}</span>
+                        </div>
+                        <h3 class="font-bold text-base text-stone-900">${item.name}</h3>
+                        <p class="text-xs text-stone-600 leading-relaxed">${item.description}</p>
+                        
+                        <div class="space-y-1.5 pt-2 border-t border-stone-200 text-xs">
+                            <div class="flex justify-between"><span class="text-stone-400 font-medium">Usia Pemberian:</span> <span class="font-bold text-stone-800">${item.age}</span></div>
+                            <div class="flex justify-between"><span class="text-stone-400 font-medium">Dosis Standar:</span> <span class="font-bold text-stone-800">${item.dose}</span></div>
+                            <div class="flex justify-between"><span class="text-stone-400 font-medium">Rute Suntik:</span> <span class="font-bold text-stone-800">${item.route}</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-stone-200/60 bg-white p-3 rounded-xl">
+                        <span class="block text-[10px] font-bold text-amberEarth-600 uppercase">Jadwal Booster / Pengulangan</span>
+                        <p class="text-xs font-semibold text-stone-700 mt-0.5">${item.booster}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterSchedule(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-stone-800', 'shadow-sm', 'active');
+                btn.classList.add('text-stone-600');
+            });
+            event.target.classList.add('bg-white', 'text-stone-800', 'shadow-sm', 'active');
+            renderScheduleCards(category);
+        }
+
+        // Calculator Logics
+        function initCalculatorDropdown() {
+            const select = document.getElementById('calc-vaccine-select');
+            select.innerHTML = '';
+            VACCINE_DATABASE.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                opt.textContent = `${v.name} (${v.species})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function runCalculator() {
+            const popSize = parseInt(document.getElementById('calc-pop-size').value) || 0;
+            const vialCap = parseInt(document.getElementById('calc-vial-capacity').value) || 1;
+            const pricePerVial = parseFloat(document.getElementById('calc-price-per-vial').value) || 0;
+
+            const totalDoses = popSize;
+            const vialsNeeded = Math.ceil(popSize / vialCap);
+            const totalCost = vialsNeeded * pricePerVial;
+
+            document.getElementById('res-total-doses').textContent = `${totalDoses} Dosis`;
+            document.getElementById('res-vials-needed').textContent = `${vialsNeeded} Vial / Botol`;
+            document.getElementById('res-total-cost').textContent = `Rp ${totalCost.toLocaleString('id-ID')}`;
+        }
+
+        // KIPI Details Display
+        function showKipiDetail(key) {
+            const data = KIPI_GUIDE[key];
+            const box = document.getElementById('kipi-result-box');
+            
+            box.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-base text-stone-900">${data.title}</h3>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold ${data.risk.includes('Darurat') ? 'bg-red-100 text-red-700' : 'bg-amberEarth-100 text-amberEarth-800'}">${data.risk}</span>
+                    </div>
+                    <p class="text-xs text-stone-600 leading-relaxed">${data.desc}</p>
+                    <div class="bg-white p-4 rounded-xl border border-stone-200">
+                        <span class="block text-xs font-bold text-farm-700 uppercase tracking-wider mb-1">Rekomendasi Tindakan:</span>
+                        <p class="text-xs text-stone-800 font-medium leading-relaxed">${data.action}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Logbook CRUD Operations via LocalStorage
+        function getStoredLogs() {
+            const stored = localStorage.getItem('vt_vaccine_logs');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveVaccineLog(e) {
+            e.preventDefault();
+            const newLog = {
+                id: Date.now(),
+                farmName: document.getElementById('log-farm-name').value,
+                species: document.getElementById('log-species').value,
+                headcount: document.getElementById('log-headcount').value,
+                vaccineName: document.getElementById('log-vaccine-name').value,
+                date: document.getElementById('log-date').value,
+                nextDate: document.getElementById('log-next-date').value || '-',
+                officer: document.getElementById('log-officer').value || '-',
+                notes: document.getElementById('log-notes').value || '-'
+            };
+
+            const logs = getStoredLogs();
+            logs.unshift(newLog);
+            localStorage.setItem('vt_vaccine_logs', JSON.stringify(logs));
+
+            document.getElementById('vaccine-log-form').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('log-date').value = today;
+
+            loadLogsTable();
+            updateDashboardStats();
+        }
+
+        function deleteLog(id) {
+            let logs = getStoredLogs();
+            logs = logs.filter(l => l.id !== id);
+            localStorage.setItem('vt_vaccine_logs', JSON.stringify(logs));
+            loadLogsTable();
+            updateDashboardStats();
+        }
+
+        function clearAllLogs() {
+            if (confirm('Apakah Anda yakin ingin menghapus seluruh log pencatatan vaksinasi?')) {
+                localStorage.removeItem('vt_vaccine_logs');
+                loadLogsTable();
+                updateDashboardStats();
+            }
+        }
+
+        function loadLogsTable() {
+            const logs = getStoredLogs();
+            const tbody = document.getElementById('logs-table-body');
+            tbody.innerHTML = '';
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-6 text-stone-400">Belum ada catatan vaksinasi yang disimpan.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-stone-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-stone-800">${log.farmName}</td>
+                    <td class="p-3">
+                        <span class="inline-block bg-stone-200 px-2 py-0.5 rounded text-[10px] font-extrabold mr-1">${log.species}</span>
+                        ${log.headcount} ekor
+                    </td>
+                    <td class="p-3 font-semibold text-farm-700">${log.vaccineName}</td>
+                    <td class="p-3 text-stone-600">${log.date}</td>
+                    <td class="p-3 font-bold text-amberEarth-600">${log.nextDate}</td>
+                    <td class="p-3 no-print">
+                        <button onclick="deleteLog(${log.id})" class="text-red-500 hover:text-red-700 p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function updateDashboardStats() {
+            const logs = getStoredLogs();
+            document.getElementById('dash-total-logs').textContent = logs.length;
+            updateChartData(logs);
+        }
+
+        // Chart.js Visualization
+        function initChart() {
+            const ctx = document.getElementById('vaccineDistributionChart').getContext('2d');
+            const logs = getStoredLogs();
+
+            const speciesCounts = calculateSpeciesCounts(logs);
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sapi / Kerbau', 'Kambing / Domba', 'Unggas', 'Babi'],
+                    datasets: [{
+                        label: 'Jumlah Sesi Vaksinasi',
+                        data: [
+                            speciesCounts['Sapi'] || 0,
+                            speciesCounts['Kambing'] || 0,
+                            speciesCounts['Unggas'] || 0,
+                            speciesCounts['Babi'] || 0
+                        ],
+                        backgroundColor: ['#52796f', '#d97706', '#10b981', '#3b82f6'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        function calculateSpeciesCounts(logs) {
+            const counts = { 'Sapi': 0, 'Kambing': 0, 'Unggas': 0, 'Babi': 0 };
+            logs.forEach(log => {
+                if (counts[log.species] !== undefined) {
+                    counts[log.species] += 1;
+                }
+            });
+            return counts;
+        }
+
+        function updateChartData(logs) {
+            if (!chartInstance) return;
+            const speciesCounts = calculateSpeciesCounts(logs);
+            chartInstance.data.datasets[0].data = [
+                speciesCounts['Sapi'] || 0,
+                speciesCounts['Kambing'] || 0,
+                speciesCounts['Unggas'] || 0,
+                speciesCounts['Babi'] || 0
+            ];
+            chartInstance.update();
+        }
+    </script>
+</body>
+</html>
